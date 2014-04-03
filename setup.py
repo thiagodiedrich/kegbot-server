@@ -40,6 +40,9 @@ DEPENDENCIES = [
   'requests == 2.2.1',
   'tweepy == 2.2',
   'jsonfield == 0.9.20',
+
+  'sockjs-tornado==1.0.0',
+  'tornado-redis==2.4.16',
 ]
 
 def setup_package():

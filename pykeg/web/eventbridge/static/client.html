@@ -1,0 +1,52 @@
+<html>
+<head>
+<script src="http://cdn.sockjs.org/sockjs-0.3.min.js"></script>
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Event Bridge Debug Client</h1>
+
+<p>
+<b>Status:</b> <span id="status">Loading Javascript...</span>
+</p>
+
+<h4>Logs:</h4>
+<p>
+<div id="logs">
+</div>
+</p>
+
+</div>
+
+<!-- Eventbridge SockJS client. -->
+<script>
+   var sock = new SockJS('http://localhost:4041/events');
+   document.getElementById("status").innerHTML = "Socket Closed.";
+
+   sock.onopen = function() {
+       console.log('open');
+       document.getElementById("status").innerHTML = "Socket Open!";
+   };
+
+   sock.onmessage = function(e) {
+       console.log('message', e.data);
+       var kbevent = JSON.parse(e.data).data;
+       console.log('kbevent', kbevent);
+       var logs = document.getElementById("logs");
+       var entry = document.createElement("li");
+       entry.innerHTML = "<b>Event " + kbevent.id + ":</b> " + kbevent.kind + "\n";
+       logs.insertBefore(entry, logs.firstChild);
+   };
+
+   sock.onclose = function() {
+       console.log('close');
+       document.getElementById("status").innerHTML = "Socket Closed.";
+   };
+</script>
+
+</body>
+</html>
