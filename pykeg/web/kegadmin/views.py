@@ -739,6 +739,18 @@ def drink_edit(request, drink_id):
             messages.error(request, 'Please provide a valid volume.')
         return redirect(drink.get_absolute_url())
 
+    elif 'submit_edit_shout' in request.POST:
+        form = forms.ChangeDrinkShoutForm(request.POST)
+        if form.is_valid():
+            shout = form.cleaned_data.get('shout')
+            try:
+                request.backend.set_drink_shout(drink, shout)
+            except:
+                messages.error(request, 'Error Setting Shout')
+        else:
+            messages.error(request, 'Invalid request')
+        return redirect(drink.get_absolute_url())
+
     messages.error(request, 'Unknown action.')
     return redirect(drink.get_absolute_url())
 

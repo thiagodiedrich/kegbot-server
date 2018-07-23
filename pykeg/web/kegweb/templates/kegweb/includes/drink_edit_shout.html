@@ -1,0 +1,10 @@
+{% load kegweblib %} 
+<form action="{% url "kegadmin-edit-drink" drink.id %}" method="POST">{% csrf_token %}
+    <div class="input">
+        <input class="span12" name="shout" type="text" placeholder="shout" maxLength=100 value="{% if drink.shout %}{{drink.shout}}{% endif %}"/>
+        <br>
+        <button class="btn" type="submit" name="submit_edit_shout">
+          <i class="icon-user"></i> {% if drink.shout %}Edit Shout{% else %}Shout Something!{% endif %}
+        </button>
+    </div> 
+</form>

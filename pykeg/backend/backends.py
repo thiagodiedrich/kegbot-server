@@ -352,6 +352,11 @@ class KegbotBackend(object):
         signals.drink_adjusted.send_robust(sender=self.__class__, drink=drink,
             previous_volume=previous_volume)
 
+    def set_drink_shout(self, drink, shout):
+        with transaction.atomic():
+            drink.shout = shout
+            drink.save(update_fields=['shout'])
+
     @transaction.atomic
     def log_sensor_reading(self, sensor_name, temperature, when=None):
         """Logs a ThermoSensor reading.

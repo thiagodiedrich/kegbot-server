@@ -618,6 +618,8 @@ class ChangeDrinkVolumeForm(forms.Form):
             self.cleaned_data['volume_ml'] = volume
         return volume
 
+class ChangeDrinkShoutForm(forms.Form):
+    shout = forms.CharField(required=False)
 
 class RecordDrinkForm(forms.Form):
     units = forms.ChoiceField(required=True, choices=ChangeDrinkVolumeForm.UNIT_CHOICES)
