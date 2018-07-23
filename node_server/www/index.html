@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+  <head>
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+    <script>
+      var sock = io();
+
+      var firstReading = 0;
+      var previousReading = 0;
+      var lastMsgMillis = 0;
+      var currBeer = "";
+
+      sock.on('twits', function(msg) {
+        console.log(msg);
+
+        var d = new Date();
+        var currMillis = d.getTime();
+
+        if (firstReading == 0 || (currMillis - lastMsgMillis) > 3000){
+           firstReading = msg.reading;
+           previousReading = msg.reading;
+           currBeer = msg.beer_name;
+        }
+        else if ((msg.reading - previousReading) <= 10 && msg.reading >= previousReading && msg.beer_name === currBeer){
+
+          document.getElementById("beername").innerHTML = "<b>" + msg.beer_name + "</b> now pouring";
+          document.getElementById("pourvalue").innerHTML = (msg.reading - firstReading).toFixed(1) + " OZ";
+
+          previousReading = msg.reading;
+
+        }
+
+        lastMsgMillis = currMillis;
+
+      });
+    </script>
+  </head>
+
+  <body>
+
+    <div id="beername">Beer Name Here!</div>
+    <div id="pourvalue">0.0</div>
+
+  </body>
+</html>
+

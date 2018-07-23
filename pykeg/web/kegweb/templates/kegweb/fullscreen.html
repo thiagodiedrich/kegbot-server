@@ -41,6 +41,13 @@ body {
 	margin-bottom:15px;
 }
 
+#footer {
+   position:fixed;
+   bottom:0;
+   height:30px;   /* Height of the footer */
+   font-size:8px;
+}
+
 img.taplist-foot-logos {
 	height:100%;
 	min-height:100%;
@@ -57,7 +64,6 @@ img.taplist-foot-logos {
 <div class="wrapper">
 
   <div class="container">
-
     <div class="row-fluid">
     <div class="span12">
     	<center>
@@ -75,11 +81,24 @@ img.taplist-foot-logos {
             {% with keg.type as beverage %}
 
             <div class="row-fluid">
-    
-            <div class="span2">
-              <img src="{{ keg.get_illustration }}" style="padding-bottom: 20px;">
-            </div>
 
+            <div class="span2" id="{{ beverage.name }}">
+              <!--<img src="{{ keg.get_illustration }}" style="padding-bottom: 20px;">-->
+              <center>
+		<p>
+		{% with keg.get_drinks as drinks %}		              
+                   {% if drinks.0.user.id == 1 %}
+                      <p><a class="btn btn-large btn-success" href="{{ drinks.0.get_absolute_url }}">ASSIGN POUR!</a></p>
+	 	   {% else %}
+			{% mugshot_box drinks.0.user 100 False %}
+		   {% endif %}
+
+		   <strong>{% drinker_name drinks.0.user nolink %}</strong> poured {% volume drinks.0.volume_ml %}<br>{{ drinks.0.time|date:"N j  g:i A" }}
+                {% endwith %}
+		</p>
+              </center>
+            </div>
+ 
             <div class="span2">
               <center>
               {% if keg.type.picture %}
@@ -95,7 +114,10 @@ img.taplist-foot-logos {
               <h2>
                 {{ beverage.name }} <small>by {{ beverage.producer }}</small>
               </h2>
-              {% if beverage.description %}
+              <p>
+	        <em><b>ABV:</b> {{ beverage.abv_percent }}%&nbsp;&nbsp;&nbsp;&nbsp;<b>IBU:</b> {{ beverage.ibu }}</em>
+	      </p>
+	      {% if beverage.description %}
                 <p>
                   <em>{{ beverage.description }}</em>
                 </p>
@@ -111,7 +133,15 @@ img.taplist-foot-logos {
 
     {% endfor %}
 
+
     </div> <!-- /tap-carousel -->
+
+        <div id="footer" class="row-fluid">
+         <center>
+            <a href="/" style="color:#888888">Home</a>
+         </center>
+        </div>
+
   </div> <!-- /container-fluid -->
 
 </div> <!-- /wrapper -->
@@ -121,6 +151,7 @@ img.taplist-foot-logos {
 
 {% block kb-extrajs %}
 <script type="text/javascript" src="{{ STATIC_URL }}lib/slick/slick.min.js"></script>
+<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 
 <script type="text/javascript">
 
@@ -138,11 +169,18 @@ img.taplist-foot-logos {
 
   // Auto-reload when something happens.
   var lastEvent = null;
-  var queryInterval = 10000;
+  var queryInterval = 17000;
+
+  //LastTimeAPourEventWasReceived
+  var lastPourEventMillis = 0;
 
   function fetchEvents() {
     $.getJSON('/api/v1/events/', function(events) {
-      if (events && events.objects && events.objects.length > 0) {
+
+      var d = new Date();
+      var now = d.getTime();
+
+      if (events && events.objects && events.objects.length > 0 && (now - lastPourEventMillis) > 3000) {
         var latest = events.objects[0];
         if (lastEvent == null || lastEvent.id != latest.id) {
           console.log('Events updated, latest=' + latest.id);
@@ -163,5 +201,47 @@ img.taplist-foot-logos {
     fetchEvents();
   });
 
+  var sock = io.connect('http://[YOUR KEGBOT SERVER IP OR HOSTNAME]:[YOUR NODE SERVER PORT]');
+      
+  var pours = {};
+
+  sock.on('twits', function(msg) {
+    console.log(msg);
+
+    if (pours[msg.beer_name] == null){
+
+       var p = new Object();
+       p.firstReading = 0;
+       p.previousReading = 0;
+       p.lastMsgMillis = 0;
+
+       pours[msg.beer_name] = p;
+
+    }
+
+    var d = new Date();
+    var currMillis = d.getTime();
+    lastPourEventMillis = currMillis;
+
+    console.log("Current Time Millis: " + currMillis + "; Last Time: " + pours[msg.beer_name].lastMsgMillis);
+
+    if (pours[msg.beer_name].firstReading == 0 || (currMillis - pours[msg.beer_name].lastMsgMillis) > 3000){
+       pours[msg.beer_name].firstReading = msg.reading;
+       pours[msg.beer_name].previousReading = msg.reading;
+       pours[msg.beer_name].lastMsgMillis = currMillis;
+    }
+    else if ((msg.reading - pours[msg.beer_name].previousReading) <= 10 && msg.reading >= pours[msg.beer_name].previousReading) {
+
+      document.getElementById(msg.beer_name).innerHTML="<center><font size='3'><b>Now Serving</b></font><br><br><font size='20'>"
+            + (msg.reading - pours[msg.beer_name].firstReading).toFixed(1) + "</font> oz</center>";
+          
+      document.getElementById(msg.beer_name).style="color:white";
+
+      pours[msg.beer_name].previousReading = msg.reading;
+      pours[msg.beer_name].lastMsgMillis = currMillis;
+
+    }
+  });
+    
 </script>
 {% endblock %}
