@@ -1,6 +1,6 @@
 {% extends 'notification/email_base.html' %}
 
-{% block subject %}[{{ site_name }}] A new session (session {{ session.id }}) has started.{% endblock %}
+{% block subject %}[{{ site_name|safe }}] A new session (session {{ session.id }}) has started.{% endblock %}
 
 {% block body_plain %}
 {% if not drink.is_guest_pour %}A new session was just kicked off by {{ drink.user }} on {{ site_name }}.

@@ -1,6 +1,6 @@
 {% extends 'notification/email_base.html' %}
 
-{% block subject %}[{{ site_name }}] New keg tapped: Keg {{ keg.id }}: {{ keg.type }}{% endblock %}
+{% block subject %}[{{ site_name|safe }}] New keg tapped: Keg {{ keg.id }}: {{ keg.type }}{% endblock %}
 
 {% block body_plain %}
 A new keg of {{ keg.type }} was just tapped on {{ site_name }}!

@@ -1,6 +1,6 @@
 {% extends 'notification/email_base.html' %}
 
-{% block subject %}[{{ site_name }}] Volume low on keg {{ keg.id }} ({{ keg.type }}){% endblock %}
+{% block subject %}[{{ site_name|safe }}] Volume low on keg {{ keg.id }} ({{ keg.type }}){% endblock %}
 
 {% block body_plain %}
 Keg {{ keg.id }} ({{ keg.type }}) is {{ keg.percent_full}}% full.
