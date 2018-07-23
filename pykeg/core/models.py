@@ -779,6 +779,12 @@ class Keg(models.Model):
         sessions_ids = Drink.objects.filter(keg=self.id).values('session_id').annotate(id=models.Count('id'), time=models.Count('time'))
         pks = [x.get('session_id') for x in sessions_ids]
         return [DrinkingSession.objects.get(pk=pk) for pk in pks]
+    #my own stuff
+    def get_drinks(self):
+	drinks = Drink.objects.filter(keg=self.id)
+        if drinks:
+	    return drinks
+        return []
 
     def get_top_users(self):
         stats = self.get_stats()

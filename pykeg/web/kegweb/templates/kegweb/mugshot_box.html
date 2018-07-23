@@ -1,7 +1,7 @@
 {% spaceless %}
 <div>
 
-{% if user %}
+{% if user and link %}
   <a href="{% url "kb-drinker" user.username %}">
 {% endif %}
 
