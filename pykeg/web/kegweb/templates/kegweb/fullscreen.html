@@ -43,9 +43,12 @@ body {
 
 #footer {
    position:fixed;
+   left:0;
    bottom:0;
+   width:100%;
    height:30px;   /* Height of the footer */
    font-size:8px;
+   text-align:center;
 }
 
 img.taplist-foot-logos {
@@ -133,14 +136,20 @@ img.taplist-foot-logos {
 
     {% endfor %}
 
-
     </div> <!-- /tap-carousel -->
 
-        <div id="footer" class="row-fluid">
-         <center>
-            <a href="/" style="color:#888888">Home</a>
-         </center>
+
+    {% if temptap.Temperature %}
+        <div class="row-fluid">
+        <center>
+            Kegerator Temp: {{ temptap.Temperature.TempF|floatformat }}&deg; F
+        </center>
         </div>
+    {% endif %}
+
+    <div id="footer">
+        <a href="/" style="color:#888888">Home</a>
+    </div>
 
   </div> <!-- /container-fluid -->
 
