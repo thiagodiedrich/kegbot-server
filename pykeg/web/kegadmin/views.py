@@ -651,14 +651,13 @@ def user_detail(request, user_id):
 @staff_member_required
 def drink_list(request):
     delete_drinks_form = forms.DeleteDrinksForm()
-
     if 'delete_drinks' in request.POST:
         form = forms.DeleteDrinksForm(request.POST)
         if form.is_valid():
             delete_ids = request.POST.getlist("delete_ids[]")
             drinks = models.Drink.objects.filter(Q(id__in=delete_ids))
             for drink in drinks:
-                drink.delete()
+                request.backend.cancel_drink(drink)
             delete_ids.reverse()
             if len(delete_ids) == 1:
                 messages.success(request, 'Drink ' + delete_ids[0] + ' has been deleted.')
