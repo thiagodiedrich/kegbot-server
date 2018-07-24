@@ -120,6 +120,7 @@ def fullscreen(request):
     active_taps = [t for t in taps if t.current_keg]
     pages = [active_taps[i:i + 4] for i in range(0, len(active_taps), 4)]
     context['pages'] = pages
+    context['temptap'] = taps[0]
 
     return render_to_response('kegweb/fullscreen.html', context_instance=context)
 
