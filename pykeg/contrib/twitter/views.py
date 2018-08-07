@@ -16,6 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Pykeg.  If not, see <http://www.gnu.org/licenses/>.
 
+
+import urlparse
+
+from django.conf import settings
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
@@ -26,6 +30,8 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 
 from httplib2 import HttpLib2Error
+
+from pykeg.backend import get_kegbot_backend
 
 from . import forms
 from . import tasks
@@ -124,7 +130,9 @@ def site_twitter_redirect(request):
     plugin = request.plugins['twitter']
 
     client = plugin.get_client()
-    url = request.build_absolute_uri(reverse('plugin-twitter-site_twitter_callback'))
+    be = get_kegbot_backend()
+    url = urlparse.urljoin(be.get_base_url(), reverse('plugin-twitter-site_twitter_callback').rstrip('callback/'))
+
     client.set_callback_url(url)
 
     return do_redirect(request, client, 'kegadmin-plugin-settings', SESSION_KEY_SITE_TWITTER)
@@ -165,7 +173,9 @@ def user_twitter_redirect(request):
 
     plugin = request.plugins['twitter']
     client = plugin.get_client()
-    url = request.build_absolute_uri(reverse('plugin-twitter-user_twitter_callback'))
+    be = get_kegbot_backend()
+    url = urlparse.urljoin(be.get_base_url(), reverse('plugin-twitter-user_twitter_callback').rstrip('callback/'))
+   
     client.set_callback_url(url)
 
     return do_redirect(request, client, 'account-plugin-settings', SESSION_KEY_USER_TWITTER)
