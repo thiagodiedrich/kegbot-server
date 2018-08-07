@@ -131,8 +131,7 @@ def site_twitter_redirect(request):
 
     client = plugin.get_client()
     be = get_kegbot_backend()
-    url = urlparse.urljoin(be.get_base_url(), reverse('plugin-twitter-site_twitter_callback').rstrip('callback/'))
-
+    url = urlparse.urljoin(be.get_base_url(), reverse('plugin-twitter-site_twitter_callback'))
     client.set_callback_url(url)
 
     return do_redirect(request, client, 'kegadmin-plugin-settings', SESSION_KEY_SITE_TWITTER)
@@ -174,7 +173,7 @@ def user_twitter_redirect(request):
     plugin = request.plugins['twitter']
     client = plugin.get_client()
     be = get_kegbot_backend()
-    url = urlparse.urljoin(be.get_base_url(), reverse('plugin-twitter-user_twitter_callback').rstrip('callback/'))
+    url = urlparse.urljoin(be.get_base_url(), reverse('plugin-twitter-user_twitter_callback'))
    
     client.set_callback_url(url)
 
