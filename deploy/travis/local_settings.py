@@ -11,6 +11,8 @@ DATABASES = {'default': {'ENGINE': 'django.db.backends.mysql', 'NAME': 'kegbot_t
 
 KEGBOT_ROOT = HOME + '/kegbot-data'
 
+KEGBOT_DEFAULT_USERNAME = 'guest'
+
 MEDIA_ROOT = KEGBOT_ROOT  + '/media'
 
 STATIC_ROOT = KEGBOT_ROOT + '/static'

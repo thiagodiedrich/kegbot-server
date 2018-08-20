@@ -191,7 +191,13 @@ class KegbotBackend(object):
         if username:
             user = self.get_user(username)
         else:
-            user = models.User.objects.get(username='guest')
+            default_user = getattr(settings, 'KEGBOT_DEFAULT_USERNAME', 'guest')
+            try:
+                user = models.User.objects.get(username=default_user)
+            except:
+                #protect if user enters incorrect username in Settings file
+                user = models.User.objects.get(username='guest')
+
 
         if not pour_time:
             pour_time = timezone.now()
