@@ -6,6 +6,7 @@
 {% block kb-extracss %}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}lib/slick/slick.css" media="screen" />
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/bootstrap-cyborg.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/fullscreen.css" media="screen" />
 
 <style>
 
@@ -147,6 +148,8 @@ img.taplist-foot-logos {
         </div>
     {% endif %}
 
+	<div id="userauth" class="flex-container auth-user"></div>
+
     <div id="footer">
         <a href="/" style="color:#888888">Home</a>
     </div>
@@ -217,6 +220,8 @@ img.taplist-foot-logos {
   sock.on('twits', function(msg) {
     console.log(msg);
 
+	if (msg.msg_type === "Flow"){
+	
     if (pours[msg.beer_name] == null){
 
        var p = new Object();
@@ -250,6 +255,13 @@ img.taplist-foot-logos {
       pours[msg.beer_name].lastMsgMillis = currMillis;
 
     }
+	}
+	else if (msg.msg_type === "UserAuth"){
+	
+		document.getElementById("userauth").innerHTML="<p>Currently pouring for <b><u>" + msg.name + "</u></b></p>";
+	
+	}
+	
   });
     
 </script>

@@ -428,7 +428,11 @@ def get_user_stats(request, username):
 
 @auth_required
 def get_auth_token(request, auth_device, token_value):
-    tok = request.backend.get_auth_token(auth_device, token_value)
+    try:
+       tok = request.backend.get_auth_token(auth_device, token_value)
+    except backend.exceptions.NoTokenError:
+       tok = request.backend.create_auth_token(auth_device, token_value)
+
     return tok
 
 

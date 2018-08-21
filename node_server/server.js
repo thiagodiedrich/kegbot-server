@@ -13,6 +13,7 @@ var client1 = redis.createClient(url);
 var io = require('socket.io')(http)
 
 var taplist = [];
+var userlist = [];
 
 //logging setup
 const tsFormat = () => (new Date()).toLocaleTimeString();
@@ -36,7 +37,10 @@ app.use('/', express.static('www'));
 
 //update information regarding taps
 refreshTaps();
+refreshUsers();
+
 setInterval(refreshTaps, config.REFRESH_TAP_DELAY);
+setInterval(refreshUsers, config.REFRESH_USER_DELAY);
 
 //start server
 http.listen(config.PORT, function(){
@@ -65,9 +69,26 @@ client1.on('message', function(chan, msg) {
 
        });
 
+       flowUpdateMsg.msg_type = "Flow";
        logger.info(flowUpdateMsg);
        io.sockets.emit('twits', flowUpdateMsg);
     }
+    else if(msgJSON.event === "UserAuthenticatedEvent"){
+
+       var userAuthMsg = new Object();
+
+       userlist.forEach((user) => {
+
+           if (user.username === msgJSON.data.username){
+              userAuthMsg.name = user.display_name;
+           }
+       });
+
+       userAuthMsg.msg_type = "UserAuth";
+       logger.info(userAuthMsg);
+       io.sockets.emit('twits', userAuthMsg);
+    }
+
 
 });
 
@@ -82,7 +103,6 @@ function refreshTaps() {
    taplist = [];
 
    request('http://localhost/api/taps', function (error, response, body) {
-      var bodyjson = JSON.parse(body);
 
       var bodyjson = JSON.parse(body);
 
@@ -101,6 +121,37 @@ function refreshTaps() {
    });
 
    //console.log(taplist);
+
+   });
+}
+
+//timer function to refresh users
+function refreshUsers() {
+
+   userlist = [];
+
+   const options = {  
+    url: 'http://localhost/api/users',
+    method: 'GET',
+    headers: {
+        'Accept': 'application/json',
+        'X-Kegbot-Api-Key': config.API_KEY
+    }
+   };
+
+
+   request(options, function (error, response, body) {
+
+      var bodyjson = JSON.parse(body);
+
+      bodyjson.objects.forEach((user) => {
+
+         var u = new Object();
+         u.username = user.username;
+         u.display_name = user.display_name;
+
+         userlist.push(u);
+      });
 
    });
 }
