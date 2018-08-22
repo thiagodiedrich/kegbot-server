@@ -211,7 +211,7 @@ img.taplist-foot-logos {
       }
     });
 	
-	if (userAuth && (now - lastAuthEventMillis) > 3000) {
+	if (userAuth && (now - lastAuthEventMillis) > 3000 && (now - lastPourEventMillis) > 3000) {
 		location.reload(true);	  
 	} 
 	
