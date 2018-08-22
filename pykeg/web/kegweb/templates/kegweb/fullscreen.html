@@ -8,7 +8,7 @@
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/bootstrap-cyborg.css" media="screen" />
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/fullscreen.css" media="screen" />
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
-
+<link href="https://fonts.googleapis.com/css?family=Permanent+Marker" rel="stylesheet">
 <style>
 
 body {
@@ -271,7 +271,7 @@ img.taplist-foot-logos {
 	else if (msg.msg_type === "UserAuth"){
 	    userAuth = true;
 		lastAuthEventMillis = currMillis;
-		document.getElementById("userauth").innerHTML="<p>Currently pouring for <b><u>" + msg.name + "</u></b></p>";	
+		document.getElementById("userauth").innerHTML="<p>Welcome, <b><u>" + msg.name.toUpperCase() + "</u></b>!</p>";	
 	}
 	
   });
