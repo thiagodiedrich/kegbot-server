@@ -13,6 +13,8 @@
       sock.on('twits', function(msg) {
         console.log(msg);
 
+        if (msg.msg_type === "Flow"){
+
         var d = new Date();
         var currMillis = d.getTime();
 
@@ -32,6 +34,13 @@
 
         lastMsgMillis = currMillis;
 
+        }
+        else if (msg.msg_type === "UserAuth"){
+
+            document.getElementById("userauth").innerHTML = "Authenticated User: " + msg.name;
+
+        }
+
       });
     </script>
   </head>
@@ -40,6 +49,7 @@
 
     <div id="beername">Beer Name Here!</div>
     <div id="pourvalue">0.0</div>
+    <div id="userauth"></div>
 
   </body>
 </html>

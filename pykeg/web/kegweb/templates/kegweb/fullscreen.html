@@ -6,6 +6,7 @@
 {% block kb-extracss %}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}lib/slick/slick.css" media="screen" />
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/bootstrap-cyborg.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/fullscreen.css" media="screen" />
 
 <style>
 
@@ -105,7 +106,7 @@ img.taplist-foot-logos {
             <div class="span2">
               <center>
               {% if keg.type.picture %}
-                <img class="tap-snapshot-image" src="{{ keg.type.picture.resized.url }}">
+                <img class="tap-snapshot-image" src="{{ keg.type.picture.resized_png.url }}">
               {% else %}
                 <img class="tap-snapshot-image" src="{{ STATIC_URL }}images/kegbot-unknown-square.png">
               {% endif %}
@@ -146,6 +147,8 @@ img.taplist-foot-logos {
         </center>
         </div>
     {% endif %}
+	
+	<div id="userauth" class="flex-container auth-user"></div>
 
     <div id="footer">
         <a href="/" style="color:#888888">Home</a>
@@ -178,16 +181,19 @@ img.taplist-foot-logos {
 
   // Auto-reload when something happens.
   var lastEvent = null;
-  var queryInterval = 17000;
+  var queryInterval = 10000;
+  var userAuth = false;
 
   //LastTimeAPourEventWasReceived
   var lastPourEventMillis = 0;
-
+  var lastAuthEventMillis = 0;
+  
   function fetchEvents() {
+  
+    var d = new Date();
+    var now = d.getTime(); 
+  
     $.getJSON('/api/v1/events/', function(events) {
-
-      var d = new Date();
-      var now = d.getTime();
 
       if (events && events.objects && events.objects.length > 0 && (now - lastPourEventMillis) > 3000) {
         var latest = events.objects[0];
@@ -199,10 +205,16 @@ img.taplist-foot-logos {
             location.reload(true);
           }
         }
-      } else {
+      }
+	  else {
         console.log('No events.');
       }
     });
+	
+	if (userAuth && (now - lastAuthEventMillis) > 3000 && (now - lastPourEventMillis) > 3000) {
+		location.reload(true);	  
+	} 
+	
     setTimeout(fetchEvents, queryInterval);
   }
 
@@ -211,45 +223,56 @@ img.taplist-foot-logos {
   });
 
   var sock = io.connect('http://[YOUR KEGBOT SERVER IP OR HOSTNAME]:[YOUR NODE SERVER PORT]');
-      
+    
+   
   var pours = {};
 
   sock.on('twits', function(msg) {
     console.log(msg);
-
-    if (pours[msg.beer_name] == null){
-
-       var p = new Object();
-       p.firstReading = 0;
-       p.previousReading = 0;
-       p.lastMsgMillis = 0;
-
-       pours[msg.beer_name] = p;
-
-    }
-
-    var d = new Date();
+	
+	var d = new Date();
     var currMillis = d.getTime();
-    lastPourEventMillis = currMillis;
 
-    console.log("Current Time Millis: " + currMillis + "; Last Time: " + pours[msg.beer_name].lastMsgMillis);
+	if (msg.msg_type === "Flow"){
+	
+		if (pours[msg.beer_name] == null){
 
-    if (pours[msg.beer_name].firstReading == 0 || (currMillis - pours[msg.beer_name].lastMsgMillis) > 3000){
-       pours[msg.beer_name].firstReading = msg.reading;
-       pours[msg.beer_name].previousReading = msg.reading;
-       pours[msg.beer_name].lastMsgMillis = currMillis;
-    }
-    else if ((msg.reading - pours[msg.beer_name].previousReading) <= 10 && msg.reading >= pours[msg.beer_name].previousReading) {
+		   var p = new Object();
+		   p.firstReading = 0;
+		   p.previousReading = 0;
+		   p.lastMsgMillis = 0;
 
-      document.getElementById(msg.beer_name).innerHTML="<center><font size='3'><b>Now Serving</b></font><br><br><font size='20'>"
-            + (msg.reading - pours[msg.beer_name].firstReading).toFixed(1) + "</font> oz</center>";
-          
-      document.getElementById(msg.beer_name).style="color:white";
+		   pours[msg.beer_name] = p;
 
-      pours[msg.beer_name].previousReading = msg.reading;
-      pours[msg.beer_name].lastMsgMillis = currMillis;
+		}
+	
+		lastPourEventMillis = currMillis;
 
-    }
+		console.log("Current Time Millis: " + currMillis + "; Last Time: " + pours[msg.beer_name].lastMsgMillis);
+
+		if (pours[msg.beer_name].firstReading == 0 || (currMillis - pours[msg.beer_name].lastMsgMillis) > 3000){
+		   pours[msg.beer_name].firstReading = msg.reading;
+		   pours[msg.beer_name].previousReading = msg.reading;
+		   pours[msg.beer_name].lastMsgMillis = currMillis;
+		}
+		else if ((msg.reading - pours[msg.beer_name].previousReading) <= 10 && msg.reading >= pours[msg.beer_name].previousReading) {
+
+		  document.getElementById(msg.beer_name).innerHTML="<center><font size='3'><b>Now Serving</b></font><br><br><font size='20'>"
+				+ (msg.reading - pours[msg.beer_name].firstReading).toFixed(1) + "</font> oz</center>";
+			  
+		  document.getElementById(msg.beer_name).style="color:white";
+
+		  pours[msg.beer_name].previousReading = msg.reading;
+		  pours[msg.beer_name].lastMsgMillis = currMillis;
+
+		}
+	}
+	else if (msg.msg_type === "UserAuth"){
+	    userAuth = true;
+		lastAuthEventMillis = currMillis;
+		document.getElementById("userauth").innerHTML="<p>Currently pouring for <b><u>" + msg.name + "</u></b></p>";	
+	}
+	
   });
     
 </script>

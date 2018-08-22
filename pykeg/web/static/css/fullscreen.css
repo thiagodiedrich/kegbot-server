@@ -1,0 +1,20 @@
+.flex-container{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-content: stretch;
+    align-items: center;
+	margin-top: 50px;
+    }
+
+.flex-item:nth-child(1){
+    order: 1;
+    flex: 0 1 auto;
+    align-self: auto;
+    }
+
+.auth-user{
+    font-size: 18px;
+    color: #adafae;
+    }
