@@ -106,7 +106,7 @@ img.taplist-foot-logos {
             <div class="span2">
               <center>
               {% if keg.type.picture %}
-                <img class="tap-snapshot-image" src="{{ keg.type.picture.resized_png.url }}">
+                <img class="tap-snapshot-image" src="{{ keg.type.picture.thumbnail_png.url }}">
               {% else %}
                 <img class="tap-snapshot-image" src="{{ STATIC_URL }}images/kegbot-unknown-square.png">
               {% endif %}

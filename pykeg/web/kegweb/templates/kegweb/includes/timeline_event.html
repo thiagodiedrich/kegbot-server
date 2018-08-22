@@ -22,10 +22,10 @@
     {% if pic %}
       <p></p>
       <a class="gallery-image" rel="gallery-{{ gallery_id }}"
-          href="{{ pic.resized.url }}"
+          href="{{ pic.thumbnail.url }}"
           title="{% drinker_name event.user nolink %} pouring drink {{ event.drink.id }}">
-        <img class="lazy" data-original="{{ pic.resized.url }}" width="1024" height="1024"/>
-        <noscript><img src="{{ pic.resized.url }}" width="1024" height="1024"/></noscript>
+        <img class="lazy" data-original="{{ pic.thumbnail.url }}" width="1024" height="1024"/>
+        <noscript><img src="{{ pic.thumbnail.url }}" width="1024" height="1024"/></noscript>
       </a>
     {% endif %}
     {% endwith %}
