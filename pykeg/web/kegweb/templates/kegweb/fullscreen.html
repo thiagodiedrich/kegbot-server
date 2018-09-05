@@ -180,61 +180,21 @@ img.taplist-foot-logos {
       });
   });
 
-  // Auto-reload when something happens.
-  var lastEvent = null;
-  var queryInterval = 10000;
+  var reloadDelay = 3000;
   var userAuth = false;
 
-  //LastTimeAPourEventWasReceived
-  var lastPourEventMillis = 0;
-  var lastAuthEventMillis = 0;
-  
-  function fetchEvents() {
-  
-    var d = new Date();
-    var now = d.getTime(); 
-  
-    $.getJSON('/api/v1/events/', function(events) {
-
-      if (events && events.objects && events.objects.length > 0 && (now - lastPourEventMillis) > 3000 && (now - lastAuthEventMillis) > 3000) {
-        var latest = events.objects[0];
-        if (lastEvent == null || lastEvent.id != latest.id) {
-          console.log('Events updated, latest=' + latest.id);
-          var prevLast = lastEvent;
-          lastEvent = latest;
-          if (prevLast != null) {
-            location.reload(true);
-          }
-        }
-      }
-	  else {
-        console.log('No events.');
-      }
-    });
-	
-	if (userAuth && (now - lastAuthEventMillis) > 20000 && (now - lastPourEventMillis) > 3000) {
+  function pageReload(){
 		location.reload(true);	  
 	} 
 	
-    setTimeout(fetchEvents, queryInterval);
-  }
-
-  $(document).ready(function(){
-    fetchEvents();
-  });
-
   var sock = io.connect('http://[YOUR KEGBOT SERVER IP OR HOSTNAME]:[YOUR NODE SERVER PORT]');
-    
    
   var pours = {};
 
   sock.on('twits', function(msg) {
     console.log(msg);
 	
-	var d = new Date();
-    var currMillis = d.getTime();
-
-	if (msg.msg_type === "Flow"){
+      if (msg.msg_type === "FlowUpdate" && msg.status === "active"){
 	
 		if (pours[msg.beer_name] == null){
 
@@ -242,21 +202,19 @@ img.taplist-foot-logos {
 		   p.firstReading = 0;
 		   p.previousReading = 0;
 		   p.lastMsgMillis = 0;
+              p.flowId = null;
 
 		   pours[msg.beer_name] = p;
 
 		}
 	
-		lastPourEventMillis = currMillis;
-
-		console.log("Current Time Millis: " + currMillis + "; Last Time: " + pours[msg.beer_name].lastMsgMillis);
-
-		if (pours[msg.beer_name].firstReading == 0 || (currMillis - pours[msg.beer_name].lastMsgMillis) > 3000){
+          if (pours[msg.beer_name].flowId == null){
+	      console.log("First Reading");
 		   pours[msg.beer_name].firstReading = msg.reading;
 		   pours[msg.beer_name].previousReading = msg.reading;
-		   pours[msg.beer_name].lastMsgMillis = currMillis;
+	      pours[msg.beer_name].flowId = msg.flowId;
 		}
-		else if ((msg.reading - pours[msg.beer_name].previousReading) <= 10 && msg.reading >= pours[msg.beer_name].previousReading) {
+          else if(pours[msg.beer_name].flowId === msg.flowId) {
 
 		  document.getElementById(msg.beer_name).innerHTML="<center><font size='3'><b>Now Serving</b></font><br><br><font size='20'>"
 				+ (msg.reading - pours[msg.beer_name].firstReading).toFixed(1) + "</font> oz</center>";
@@ -264,14 +222,12 @@ img.taplist-foot-logos {
 		  document.getElementById(msg.beer_name).style="color:white";
 
 		  pours[msg.beer_name].previousReading = msg.reading;
-		  pours[msg.beer_name].lastMsgMillis = currMillis;
 
 		}
 	}
 	else if (msg.msg_type === "UserAuth"){
 	
 	    if(msg.assigned){
-		lastAuthEventMillis = currMillis;
 		   userAuth = true;
 		   document.getElementById("userauth").innerHTML="<p>Welcome, <b><u>" + msg.name + "</u></b>!</p>";
 	    }
@@ -279,7 +235,9 @@ img.taplist-foot-logos {
            document.getElementById("userauth").innerHTML="<p class=\"fadeOut\">Token not assigned!</p>";
 		}
 	}
-	
+      else if (msg.msg_type === "FlowUpdate" && msg.status === "completed"){
+	  setTimeout(pageReload, reloadDelay);
+      }	
   });
     
 </script>
