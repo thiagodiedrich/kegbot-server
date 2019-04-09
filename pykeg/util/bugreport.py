@@ -97,7 +97,7 @@ def bugreport(fd):
 
     fd.write(SEPARATOR)
     writeline(fd, '## `kegbot migrate --list` output\n')
-    writeline(fd, get_output('kegbot migrate --list --no-color --noinput'))
+    writeline(fd, get_output('kegbot migrate --list --noinput'))
     writeline(fd, '\n')
 
     fd.write(SEPARATOR)
