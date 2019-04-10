@@ -393,8 +393,8 @@ class ApiClientTestCase(BaseApiTestCase):
 
     def test_auth_tokens(self):
         response, data = self.get('auth-tokens/nfc/deadbeef', HTTP_X_KEGBOT_API_KEY=self.apikey.key)
-        self.assertEquals(data.meta.result, 'error')
-        self.assertEquals(response.status_code, 404)
+        self.assertEquals(data.meta.result, 'ok')
+        self.assertEquals(response.status_code, 200)
 
         response, data = self.post('auth-tokens/nfc/deadbeef/assign', HTTP_X_KEGBOT_API_KEY=self.apikey.key,
             data={'username': self.normal_user.username})
