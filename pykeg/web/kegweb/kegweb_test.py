@@ -66,7 +66,7 @@ class KegwebTestCase(TransactionTestCase):
             beverage_type='beer', style_name='Unknown')
         d = b.record_drink('kegboard.flow0', ticks=123, shout='_UNITTEST_')
         response = self.client.get(d.get_absolute_url())
-        self.assertContains(response, '<p>_UNITTEST_</p>', status_code=200)
+        self.assertContains(response, '_UNITTEST_', status_code=200)
 
     def test_privacy(self):
         b = get_kegbot_backend()
