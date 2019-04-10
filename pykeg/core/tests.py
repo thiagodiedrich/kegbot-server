@@ -34,7 +34,7 @@ def path_for_import(name):
 
 
 class CoreTests(TestCase):
-	@unittest.skip('Temporarily Disable Lint')
+    @unittest.skip('Temporarily Disable Lint')
     def test_flake8(self):
         root_path = path_for_import('pykeg')
         command = 'flake8 {}'.format(root_path)
