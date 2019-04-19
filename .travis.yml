@@ -6,6 +6,7 @@ install:
   - pip install -r requirements.txt
   - pip install -r test_requirements.txt
   - pip install coverage coveralls
+  - pip install .
 
 services:
   - redis-server
@@ -17,21 +18,21 @@ before_script:
   - mkdir -p ~/kegbot-data/static
   - mkdir -p ~/.kegbot/
   - cp deploy/travis/local_settings.py ~/.kegbot/
-  - pip freeze
   - flake8 --version
 
 script:
-  - kegbot test --traverse-namespace --first-package-wins --with-coverage --cover-package=pykeg
+  #- kegbot test --traverse-namespace --first-package-wins --with-coverage --cover-package=pykeg
+  - kegbot test --traverse-namespace --first-package-wins --cover-package=pykeg --nocapture --nologcapture
 
 after_success:
   - coveralls
 
-deploy:
-  provider: pypi
-  user: mikey
-  password:
-    secure: amERhNGbfgTb/1vlWJ8SpDSTUlmx8GlysllFlqIT6H/X2+XiLFRjmH+T6UXWcHurGzwC71/QC0LGlSg69d4wGarXKnDowInjA9NR+s763gcbWIKixAWxiVrHl/LHTd3n+5ZCaYVDjHCX4RCRdunQ3DESELCkJ4U9RCVHtIGki8k=
-  on:
-    tags: true
-    repo: Kegbot/kegbot-server
-    branch: master
+#deploy:
+#  provider: pypi
+#  user: mikey
+#  password:
+#    secure: amERhNGbfgTb/1vlWJ8SpDSTUlmx8GlysllFlqIT6H/X2+XiLFRjmH+T6UXWcHurGzwC71/QC0LGlSg69d4wGarXKnDowInjA9NR+s763gcbWIKixAWxiVrHl/LHTd3n+5ZCaYVDjHCX4RCRdunQ3DESELCkJ4U9RCVHtIGki8k=
+#  on:
+#    tags: true
+#    repo: Kegbot/kegbot-server
+#    branch: master
