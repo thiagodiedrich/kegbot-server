@@ -21,7 +21,8 @@ before_script:
   - flake8 --version
 
 script:
-  - kegbot test --traverse-namespace --first-package-wins --with-coverage --cover-package=pykeg
+  #- kegbot test --traverse-namespace --first-package-wins --with-coverage --cover-package=pykeg
+  - kegbot test --traverse-namespace --first-package-wins --cover-package=pykeg --nocapture --nologcapture
 
 after_success:
   - coveralls
