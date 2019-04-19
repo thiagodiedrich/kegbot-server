@@ -59,5 +59,5 @@ unless otherwise noted, and may not be reused without permission.
 We love getting patches! Send us a pull request, or hop on to IRC if
 you'd like to chat about something substantial.
 
-[![Build Status](https://travis-ci.org/Kegbot/kegbot-server.png?branch=master)](https://travis-ci.org/Kegbot/kegbot-server)
+[![Build Status](https://travis-ci.org/johnnyruz/kegbot-server.svg?branch=master)](https://travis-ci.org/johnnyruz/kegbot-server)
 
